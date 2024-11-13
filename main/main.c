@@ -26,19 +26,50 @@ void get_input(char *str, int max_len) //declaring function, a char pointer and 
     }
 }
 
-void deposit(const char *balance, const char *data)
+void update_deposit(const char *balance, double deposit)
 {
+    double current_balance = 0.0;
 
+    //open the file to read the current balance
+    FILE *bal = fopen("balance.txt", "r");
+
+    if(bal == NULL)
+    {
+        //if the file does not exist print error
+        printf("Error opening file for reading");
+    }
+    else
+    {
+        //read the existing balance from the file
+        fscanf(bal, "%lf", &current_balance);
+
+        //close the file after reading
+        fclose(bal);
+    }
+
+    //add the deposit to the current balance
+    current_balance += deposit;
+
+    //open the file again in write mode
+    bal = fopen("balance.txt","w");
+
+    //write the updated balance back to the file
+    fprintf(bal, "%.2f\n", current_balance);
+
+    //close the file
+    fclose(bal);
+
+    printf("New balance: %.2f\n", current_balance);
 }
 
 int main()
 {
+    //balance for reading and writing
+    const char *balance = "balance.txt";
+    double deposit;
+
     //main menu options = deposit, withdraw, check balance, exit;
     int user_mm_input = 0;  
-    int deposit = 1;
-    int withdraw = 2;
-    int checkbalance = 3;
-    int exit = 4;
 
     //Boolean(but int) for username and password validation
     int pwvalid = 0;
@@ -58,7 +89,7 @@ int main()
     unf = fopen("C:\\Users\\alexs\\OneDrive\\Desktop\\GitHub\\CBankManagementSystem\\main\\Database\\un.txt", "r");
 
     //opens password file
-    pwf = fopen("C:\\Users\\alexs\\OneDrive\\Desktop\\GitHub\\CBankManagementSystem\\main\\Database\\un.txt", "r");
+    pwf = fopen("C:\\Users\\alexs\\OneDrive\\Desktop\\GitHub\\CBankManagementSystem\\main\\Database\\pw.txt", "r");
 
     //checks if there is a username in file
     if(unf == NULL)
@@ -106,33 +137,39 @@ int main()
     fclose(unf);
     fclose(pwf);
 
-    printf("Welcome to the C Bank Management System\n");
-
-    printf("Please enter username\n");
-    get_input(un, sizeof(un));
-
-    if(strcmp(un, unfile) == 0)
+    do
     {
-        printf("correct username!");
-        unvalid = 1;
-    }
-    else
-    {
-        printf("incorrect.");
-    }
+        printf("Welcome to the C Bank Management System\n");
 
-    printf("Please enter password!\n");
-    get_input(pw, sizeof(pw));
+        printf("Please enter username\n");
+        get_input(un, sizeof(un));
 
-    if(strcmp(pw, pwfile) == 0)
-    {
-        print("correct password!");
-        pwvalid = 1;
-    }
-    else
-    {
-        printf("Incorrect!");
-    }
+        if(strcmp(un, unfile) == 0)
+        {
+            printf("correct username!");
+            unvalid = 1;
+        }
+        else
+        {
+            printf("incorrect.");
+        }
+
+        if(unvalid == 1)
+        {
+            printf("Please enter password!\n");
+            get_input(pw, sizeof(pw));
+
+            if(strcmp(pw, pwfile) == 0)
+            {
+                printf("correct password!");
+                pwvalid = 1;
+            }
+            else
+            {
+                printf("Incorrect!");
+            }
+        }
+    } while (unvalid == 0 || pwvalid == 0);
 
     //checks if username and password are correct
     if(unvalid == 1 && pwvalid == 1)
@@ -143,7 +180,14 @@ int main()
             printf("1: Deposit\n2:Withdraw\n3:Check Balance\n4:Exit");
 
             scanf(" %d", &user_mm_input);
-        } while (user_mm_input != 1 && user_mm_input != 2 && user_mm_input != 3 && user_mm_input != 4);
+
+            if(user_mm_input == 1)
+            {
+                printf("Enter the deposit amount: ");
+                scanf("%1f", &deposit);
+                update_deposit(balance, deposit);
+            }
+        } while (user_mm_input != 4);
         
     }
 
