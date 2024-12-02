@@ -1,0 +1,2 @@
+accountid,branch,firstname,lastname,balance,username,password
+1,dublin,aleksy,szopinski,10000000.00,aleksy03,password
